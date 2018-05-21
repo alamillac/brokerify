@@ -1,10 +1,10 @@
 #!/bin/env python
 
 import requests
-from stocks import StockCodes, MarketNames
+from app.codes import StockCodes, MarketCodes
 
-#AVAILABLE_MARKETS = [MarketNames.BME, MarketNames.NYSE, MarketNames.NASDAQ]
-AVAILABLE_MARKETS = [MarketNames.BME]
+#AVAILABLE_MARKETS = [MarketCodes.BME, MarketCodes.NYSE, MarketCodes.NASDAQ]
+AVAILABLE_MARKETS = [MarketCodes.BME]
 
 codes = {
 # BME

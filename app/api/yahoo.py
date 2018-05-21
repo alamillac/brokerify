@@ -5,9 +5,9 @@ import requests
 import datetime
 import re
 from bs4 import BeautifulSoup
-from stocks import MarketNames
+from app.codes import MarketCodes
 
-AVAILABLE_MARKETS = [MarketNames.BME, MarketNames.NYSE, MarketNames.NASDAQ]
+AVAILABLE_MARKETS = [MarketCodes.BME, MarketCodes.NYSE, MarketCodes.NASDAQ]
 
 def api(stock):
     def parse(response, stock):
@@ -17,7 +17,7 @@ def api(stock):
         def get_value_js(response, name):
             return re.match(".+"+name+"\":{\"raw\":([^,]+),", response.replace('\n','')).group(1)
         def parse_percentage(value):
-            return float(value.replace("%","").replace(",","."))
+            return float(value.replace("%","").replace(",",".").replace("N/A", "0"))
         parser = BeautifulSoup(response, 'html.parser')
         growth_table = parser.find("th", text="Estimaciones de crecimiento").parent.parent.parent
         growth_current_year = get_value(growth_table, "Año actual")

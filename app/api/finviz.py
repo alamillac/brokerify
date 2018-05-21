@@ -3,9 +3,9 @@
 import requests
 import datetime
 from bs4 import BeautifulSoup
-from stocks import MarketNames
+from app.codes import MarketCodes
 
-AVAILABLE_MARKETS = [MarketNames.NYSE, MarketNames.NASDAQ]
+AVAILABLE_MARKETS = [MarketCodes.NYSE, MarketCodes.NASDAQ]
 
 def api(stock):
     def parse(response, stock):

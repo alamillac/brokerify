@@ -1,11 +1,14 @@
-class MarketNames:
-    BME = "bme"
-    NASDAQ = "nasdaq"
-    NYSE = "nyse"
+class MarketCodes:
+    BME = "BME"
+    NASDAQ = "NASDAQ"
+    NYSE = "NYSE"
 
 
-class IndexNames:
-    IBEX35 = "ibex35"
+class IndexCodes:
+    IBEX35 = "IBEX35"
+    SP500 = "SPX"
+    DOW_JONES = "DJIA"
+    NASDAQ100 = "NASDAQ"
 
 
 class StockCodes:
@@ -86,39 +89,3 @@ class StockCodes:
     BANK_OF_AMERICA = "BAC"
     _3M = "MMM"
     # ...
-
-
-class Index:
-    def __init__(self, name, code=None):
-        self.name = name
-        self.code = code or name.lower()
-
-
-class Stock:
-    def __init__(self, name, code, market, index=None):
-        self.name = name
-        self.code = code
-        self.market = market
-        self.index = index
-
-
-class Market:
-    def __init__(self, name, stocks_data, code=None):
-        self.name = name
-        self.code = code or name.lower()
-
-        # Create stocks
-        stock_map = {}
-        index_map = {}
-        for stock_name, stock_code, index_name in stocks_data:
-            index = None
-            if index_name:
-                try:
-                    index = index_map[index_name]
-                except KeyError:
-                    index = Index(index_name)
-                    index_map[index_name] = index
-            stock_map[stock_code] = Stock(stock_name, stock_code, self, index)
-
-        self.stocks = stock_map.values()
-        self.index = index_map.values()
