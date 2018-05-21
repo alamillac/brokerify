@@ -35,6 +35,16 @@ class Index(TableBase):
     def all(cls):
         return db_session.query(cls).all()
 
+    def get_return_from_date(self, date):
+        historical_prices = db_session.query(IndexHistoricalPrices).filter(
+            IndexHistoricalPrices.index_id == self.id,
+            IndexHistoricalPrices.date >= date
+        ).order_by(IndexHistoricalPrices.date).all()
+        if not historical_prices:
+            return []
+        fp = historical_prices[0] # First price
+        return [{"date": hi.date, "return": hi.close_price/fp.close_price} for hi in historical_prices]
+
 
 class Market(TableBase):
     __tablename__ = "market"
@@ -75,6 +85,16 @@ class Stock(TableBase):
     @classmethod
     def all(cls):
         return db_session.query(cls).all()
+
+    def get_return_from_date(self, date):
+        historical_prices = db_session.query(StockHistoricalData).filter(
+            StockHistoricalData.stock_id == self.id,
+            StockHistoricalData.date >= date
+        ).order_by(StockHistoricalData.date).all()
+        if not historical_prices:
+            return []
+        fp = historical_prices[0] # First price
+        return [{"date": hi.date, "return": hi.price/fp.price} for hi in historical_prices]
 
 
 class IndexHistoricalPrices(TableBase):
