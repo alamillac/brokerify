@@ -1,4 +1,5 @@
 import logging
+import datetime
 import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date, DateTime, func, ForeignKey, Index as IndexColumn
 from sqlalchemy.ext.declarative import declarative_base
@@ -26,6 +27,14 @@ class Index(TableBase):
     code = Column(String(30), nullable=False, index=True, unique=True)
     name = Column(String(100), nullable=False)
 
+    @classmethod
+    def get(cls, code):
+        return db_session.query(cls).filter(cls.code == code).one_or_none()
+
+    @classmethod
+    def all(cls):
+        return db_session.query(cls).all()
+
 
 class Market(TableBase):
     __tablename__ = "market"
@@ -33,6 +42,15 @@ class Market(TableBase):
     id = Column(Integer, primary_key=True, autoincrement=True)
     code = Column(String(30), nullable=False, index=True, unique=True)
     name = Column(String(100), nullable=False)
+    currency = Column(String(3), nullable=False)
+
+    @classmethod
+    def get(cls, code):
+        return db_session.query(cls).filter(cls.code == code).one_or_none()
+
+    @classmethod
+    def all(cls):
+        return db_session.query(cls).all()
 
 
 class Stock(TableBase):
@@ -76,6 +94,36 @@ class IndexHistoricalPrices(TableBase):
     close_price = Column(Float, nullable=False)
     index = relationship("Index")
 
+    @classmethod
+    def get(cls, index_code, date):
+        index = Index.get(index_code)
+        return db_session.query(cls).filter(cls.index_id == index.id, cls.date == date).one_or_none()
+
+    @classmethod
+    def bulk_insert(cls, index_prices):
+        if not index_prices:
+            logger.info("Nothing to save in IndexHistoricalPrices")
+            return
+
+        items = []
+        now = datetime.datetime.now()
+        for index_data in index_prices:
+            index = Index.get(index_data["name"])
+            if not index:
+                logger.error("Index %s not found" % index_data["name"])
+                continue
+
+            items.append({
+                "import_date": now,
+                "index_id": index.id,
+                "date": index_data["date"],
+                "open_price": index_data["open"],
+                "high_price": index_data["high"],
+                "low_price": index_data["low"],
+                "close_price": index_data["close"]
+            })
+        db_engine.execute(cls.__table__.insert(), items)
+
 
 class StockHistoricalData(TableBase):
     __tablename__ = "stock_data"
@@ -114,8 +162,40 @@ class StockHistoricalData(TableBase):
 
     @property
     def fixed_potential(self):
+        if self.expected_price:
+            expected_price = self.expected_price
+        else:
+            expected_price = self.max_52 * 0.85
         expected_price_fixed = min(
-            self.expected_price,
+            expected_price,
             (self.expected_price + self.max_52)/2
         )
         return (expected_price_fixed - self.price) * 100 / self.price
+
+    @classmethod
+    def bulk_insert(cls, stock_data):
+        if not stock_data:
+            logger.info("Nothing to save in StockHistoricalData")
+            return
+
+        now = datetime.datetime.now()
+        items = []
+        for d in stock_data:
+            stock = Stock.get(d["code"])
+            if not stock:
+                logger.error("Stock %s not found" % d["code"])
+                continue
+
+            items.append({
+                "import_date": now,
+                "date": d["date"],
+                "stock_id": stock.id,
+                "price": d["value"],
+                "expected_price": d["fundamental_analysis"]["expected_price"],
+                "max_52": d["max_52"],
+                "per": d["ratios"]["per"],
+                "growth_next_year": d["fundamental_analysis"]["growth_next_year"],
+                "growth_next_five_year": d["fundamental_analysis"]["growth_next_five_year"],
+                "dividend_yield": d["dividend_yield"]
+            })
+        db_engine.execute(cls.__table__.insert(), items)

@@ -1,6 +1,7 @@
 #!/bin/env python
 
 import requests
+import datetime
 from app.codes import StockCodes, MarketCodes
 
 #AVAILABLE_MARKETS = [MarketCodes.BME, MarketCodes.NYSE, MarketCodes.NASDAQ]
@@ -93,12 +94,14 @@ def api(stock):
 
     def parse(response, stock):
         data = response["valor"]
+        date = datetime.datetime.strptime(data["fecha"], "%d/%m/%Y").date()
         ratios = data["ratios"]
         fundamental_analysis = data["analisis_fundamental"]
         technical_analysis = data["analisis_tecnico"]
         return {
             "name": data["nombre"],
-            "date": data["fecha"],
+            "code": stock.code,
+            "date": date,
             "value": to_float(data["cotizacion"]),
             "change": to_float(data["cambio"]),
             "change_percent": to_float(data["cambio_porcentual"]),

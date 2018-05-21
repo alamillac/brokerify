@@ -13,7 +13,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import String
 from sqlalchemy.sql import table, column
-from app.codes import MarketCodes
+from app.codes import MarketCodes, CurrencyCodes
 
 
 # revision identifiers, used by Alembic.
@@ -26,13 +26,14 @@ depends_on = None
 def upgrade():
     market = table('market',
         column('name', String),
-        column('code', String)
+        column('code', String),
+        column('currency', String)
     )
     op.bulk_insert(market,
         [
-            {"name": "BME", "code": MarketCodes.BME},
-            {"name": "NASDAQ", "code": MarketCodes.NASDAQ},
-            {"name": "NYSE", "code": MarketCodes.NYSE}
+            {"name": "BME", "code": MarketCodes.BME, "currency": CurrencyCodes.EUR},
+            {"name": "NASDAQ", "code": MarketCodes.NASDAQ, "currency": CurrencyCodes.USD},
+            {"name": "NYSE", "code": MarketCodes.NYSE, "currency": CurrencyCodes.USD}
         ]
     )
 

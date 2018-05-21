@@ -33,6 +33,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('code', sa.String(length=30), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('currency', sa.String(length=3), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_market_code'), 'market', ['code'], unique=True)

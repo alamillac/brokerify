@@ -89,3 +89,8 @@ class StockCodes:
     BANK_OF_AMERICA = "BAC"
     _3M = "MMM"
     # ...
+
+
+class CurrencyCodes:
+    EUR = "EUR"
+    USD = "USD"

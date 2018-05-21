@@ -28,7 +28,8 @@ def api(stock):
 
         return {
             "name": stock.name,
-            "date": datetime.datetime.now().strftime("%d/%m/%Y"),
+            "code": stock.code,
+            "date": datetime.date.today(),
             "value": price,
             "change": "",
             "change_percent": "",
