@@ -69,6 +69,10 @@ class Stock(TableBase):
         return db_session.query(cls).filter(cls.code == code).one_or_none()
 
     @classmethod
+    def get_by_name(cls, name):
+        return db_session.query(cls).filter(cls.name == name).one_or_none()
+
+    @classmethod
     def all(cls):
         return db_session.query(cls).all()
 
@@ -199,3 +203,31 @@ class StockHistoricalData(TableBase):
                 "dividend_yield": d["dividend_yield"]
             })
         db_engine.execute(cls.__table__.insert(), items)
+
+    @classmethod
+    def get(cls, stock_code, date):
+        stock = Stock.get(stock_code)
+        return db_session.query(cls).filter(cls.stock_id == stock.id, cls.date == date).one_or_none()
+
+    @classmethod
+    def get_or_create(cls, data):
+        if not data:
+            logger.info("Null data received")
+            return
+
+        stock = Stock.get(data["code"])
+        if not stock:
+            logger.error("Stock %s not found" % data["code"])
+            return
+        instance = cls.get(stock.code, data["date"])
+
+        if instance:
+            return instance
+
+        del data["code"]
+        data["stock_id"] = stock.id
+        instance = cls(**data)
+        instance.import_date = datetime.datetime.now()
+        db_session.add(instance)
+        db_session.flush()
+        return instance

@@ -77,7 +77,7 @@ def upgrade():
             {"name": "SIEMENS_GAMESA", "code": StockCodes.SIEMENS_GAMESA, "market_id": market_map[MarketCodes.BME], "index_id": index_map[IndexCodes.IBEX35]},
             {"name": "TECNICAS_REUNIDAS", "code": StockCodes.TECNICAS_REUNIDAS, "market_id": market_map[MarketCodes.BME], "index_id": index_map[IndexCodes.IBEX35]},
             {"name": "TELEFONICA", "code": StockCodes.TELEFONICA, "market_id": market_map[MarketCodes.BME], "index_id": index_map[IndexCodes.IBEX35]},
-            {"name": "VISCOFA", "code": StockCodes.VISCOFAN, "market_id": market_map[MarketCodes.BME], "index_id": index_map[IndexCodes.IBEX35]},
+            {"name": "VISCOFAN", "code": StockCodes.VISCOFAN, "market_id": market_map[MarketCodes.BME], "index_id": index_map[IndexCodes.IBEX35]},
             {"name": "BME", "code": StockCodes.BME, "market_id": market_map[MarketCodes.BME], "index_id": None},
 
             # NASDAQ
