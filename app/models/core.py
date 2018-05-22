@@ -96,6 +96,11 @@ class Stock(TableBase):
         fp = historical_prices[0] # First price
         return [{"date": hi.date, "return": hi.price/fp.price} for hi in historical_prices]
 
+    def get_data(self):
+        return db_session.query(StockHistoricalData).filter(
+            StockHistoricalData.stock_id == self.id
+        ).order_by(StockHistoricalData.date.desc()).first()
+
 
 class IndexHistoricalPrices(TableBase):
     __tablename__ = "index_prices"
@@ -251,3 +256,6 @@ class StockHistoricalData(TableBase):
         db_session.add(instance)
         db_session.flush()
         return instance
+
+    def __repr__(self):
+        return "%s: price(%.2f) per(%.2f) growth(%.2f) dividend(%.2f) potential(%.2f) valorization(%.2f)" % (self.stock.name, self.price, self.per, self.growth_next_five_year, self.dividend_yield, self.potential, self.approx_valorization)
