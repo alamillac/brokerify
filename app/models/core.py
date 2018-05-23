@@ -79,6 +79,10 @@ class Stock(TableBase):
         return db_session.query(cls).filter(cls.code == code).one_or_none()
 
     @classmethod
+    def get_by_id(cls, id):
+        return db_session.query(cls).filter(cls.id == id).one_or_none()
+
+    @classmethod
     def get_by_name(cls, name):
         return db_session.query(cls).filter(cls.name == name).one_or_none()
 
@@ -227,7 +231,21 @@ class StockHistoricalData(TableBase):
                 "growth_next_five_year": d["fundamental_analysis"]["growth_next_five_year"],
                 "dividend_yield": d["dividend_yield"]
             })
-        db_engine.execute(cls.__table__.insert(), items)
+        try:
+            db_engine.execute(cls.__table__.insert(), items)
+        except sqlalchemy.exc.IntegrityError:
+            for item in items:
+                stock = Stock.get_by_id(item["stock_id"])
+                instance = cls.get(stock.code, item["date"])
+                instance.price = item["price"]
+                instance.expected_price = item["expected_price"]
+                instance.max_52 = item["max_52"]
+                instance.per = item["per"]
+                instance.growth_next_year = item["growth_next_year"]
+                instance.growth_next_five_year = item["growth_next_five_year"]
+                instance.dividend_yield = item["dividend_yield"]
+                db_session.add(instance)
+            db_session.flush()
 
     @classmethod
     def get(cls, stock_code, date):
