@@ -1,10 +1,11 @@
 import logging
 import datetime
 import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, String, Float, Date, DateTime, func, ForeignKey, Index as IndexColumn
+from sqlalchemy import create_engine, Column, Enum, Integer, String, Float, Date, DateTime, func, ForeignKey, Index as IndexColumn
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from app import settings
+import enum
 
 # Index table
 
@@ -287,3 +288,59 @@ class StockHistoricalData(TableBase):
 
     def __repr__(self):
         return "%s: price(%.2f) per(%.2f) growth(%.2f) dividend(%.2f) potential(%.2f) valorization(%.2f)" % (self.stock.name, self.price, self.per, self.growth_next_five_year, self.dividend_yield, self.potential, self.approx_valorization)
+
+
+class Portfolio(TableBase):
+    __tablename__ = "portfolio"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)
+    currency = Column(String(3), nullable=False)
+    objective_id = Column(Integer, ForeignKey('portfolio_objective.id'), nullable=True)
+
+    objective = relationship('Objective')
+
+    @property
+    def price(self):
+        return 0  # TODO
+
+    @property
+    def risk(self):
+        return 0  # TODO 14% volatilidad
+    # TODO Diversificación (por fecha, por sector, por pais, por moneda)
+    # TODO Rentabilidad (1mes, 3meses, 1año, desde inicio, etc) %, Tendencia %, Ratio Sharpe, VaR 95% anual -23,00%
+    # TODO Dividendos
+
+
+class PortfolioStock(TableBase):
+    __tablename__ = "portfolio_stock"
+
+    class Type(enum.Enum):
+        BUY = 0
+        SELL = 1
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    portfolio_id = Column(Integer, ForeignKey('portfolio.id'), nullable=False)
+    stock_id = Column(Integer, ForeignKey('stock.id'), nullable=False)
+    type = Column(Enum(Type), nullable=False)
+    date = Column(Date, nullable=False)
+    num_stocks = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
+    commission_price = Column(Float, nullable=False)
+    currency = Column(String(3), nullable=False)
+    exchange_rate = Column(Float, nullable=False, default=1)
+
+
+class Objective(TableBase):
+    __tablename__ = "portfolio_objective"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)
+    initial_investment = Column(Float, nullable=False)
+    monthly_investment = Column(Float, nullable=False)
+    currency = Column(String(3), nullable=False)
+    end_date = Column(Date, nullable=False)
+    inflation = Column(Float, nullable=False)
+    risk = Column(Float, nullable=False)
+    taxes = Column(Float, nullable=False)
+    expected_return = Column(Float, nullable=False)
