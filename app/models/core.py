@@ -35,11 +35,16 @@ class Index(TableBase):
     def all(cls):
         return db_session.query(cls).all()
 
-    def get_return_from_date(self, date):
-        historical_prices = db_session.query(IndexHistoricalPrices).filter(
-            IndexHistoricalPrices.index_id == self.id,
-            IndexHistoricalPrices.date >= date
-        ).order_by(IndexHistoricalPrices.date).all()
+    def get_return_from_date(self, date=None):
+        if date:
+            historical_prices = db_session.query(IndexHistoricalPrices).filter(
+                IndexHistoricalPrices.index_id == self.id,
+                IndexHistoricalPrices.date >= date
+            ).order_by(IndexHistoricalPrices.date).all()
+        else:
+            historical_prices = db_session.query(IndexHistoricalPrices).filter(
+                IndexHistoricalPrices.index_id == self.id
+            ).order_by(IndexHistoricalPrices.date).all()
         if not historical_prices:
             return []
         fp = historical_prices[0] # First price
@@ -90,11 +95,16 @@ class Stock(TableBase):
     def all(cls):
         return db_session.query(cls).all()
 
-    def get_return_from_date(self, date):
-        historical_prices = db_session.query(StockHistoricalData).filter(
-            StockHistoricalData.stock_id == self.id,
-            StockHistoricalData.date >= date
-        ).order_by(StockHistoricalData.date).all()
+    def get_return_from_date(self, date=None):
+        if date:
+            historical_prices = db_session.query(StockHistoricalData).filter(
+                StockHistoricalData.stock_id == self.id,
+                StockHistoricalData.date >= date
+            ).order_by(StockHistoricalData.date).all()
+        else:
+            historical_prices = db_session.query(StockHistoricalData).filter(
+                StockHistoricalData.stock_id == self.id
+            ).order_by(StockHistoricalData.date).all()
         if not historical_prices:
             return []
         fp = historical_prices[0] # First price
