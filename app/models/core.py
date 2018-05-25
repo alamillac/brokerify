@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, Column, Enum, Integer, String, Float, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from app import settings
+from app.codes import CurrencyCodes
 import enum
 
 # Index table
@@ -79,6 +80,10 @@ class Stock(TableBase):
     index_id = Column(Integer, ForeignKey('index.id'), nullable=True)
     market = relationship('Market')
     index = relationship('Index')
+
+    @property
+    def currency(self):
+        return self.market.currency
 
     @classmethod
     def get(cls, code):
@@ -294,9 +299,13 @@ class Portfolio(TableBase):
     __tablename__ = "portfolio"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=func.now)
+    updated_at = Column(DateTime, nullable=False)
     name = Column(String(100), nullable=False)
-    currency = Column(String(3), nullable=False)
+    currency = Column(String(3), nullable=False, default=CurrencyCodes.EUR)
     objective_id = Column(Integer, ForeignKey('portfolio_objective.id'), nullable=True)
+    sell_tax = Column(Float, nullable=False, default=0.19)
+    dividend_tax = Column(Float, nullable=False, default=0.19)
 
     objective = relationship('Objective')
 
@@ -320,6 +329,8 @@ class PortfolioStock(TableBase):
         SELL = 1
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=func.now)
+    updated_at = Column(DateTime, nullable=False)
     portfolio_id = Column(Integer, ForeignKey('portfolio.id'), nullable=False)
     stock_id = Column(Integer, ForeignKey('stock.id'), nullable=False)
     type = Column(Enum(Type), nullable=False)
@@ -327,20 +338,48 @@ class PortfolioStock(TableBase):
     num_stocks = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
     commission_price = Column(Float, nullable=False)
-    currency = Column(String(3), nullable=False)
     exchange_rate = Column(Float, nullable=False, default=1)
 
+    stock = relationship('Stock')
 
-class Objective(TableBase):
+    @property
+    def currency(self):
+        return self.stock.currency
+
+
+class PortfolioObjective(TableBase):
     __tablename__ = "portfolio_objective"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=func.now)
+    updated_at = Column(DateTime, nullable=False)
     name = Column(String(100), nullable=False)
     initial_investment = Column(Float, nullable=False)
     monthly_investment = Column(Float, nullable=False)
-    currency = Column(String(3), nullable=False)
+    currency = Column(String(3), nullable=False, default=CurrencyCodes.EUR)
     end_date = Column(Date, nullable=False)
-    inflation = Column(Float, nullable=False)
-    risk = Column(Float, nullable=False)
-    taxes = Column(Float, nullable=False)
+    inflation = Column(Float, nullable=False, default=0.03)
+    risk = Column(Float, nullable=False, default=0.15)
+    taxes = Column(Float, nullable=False, default=0.19)
     expected_return = Column(Float, nullable=False)
+
+
+class PortfolioDividend(TableBase):
+    __tablename__ = "portfolio_dividend"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=func.now)
+    updated_at = Column(DateTime, nullable=False)
+    stock_id = Column(Integer, ForeignKey('stock.id'), nullable=False)
+    date = Column(Date, nullable=False)
+    value = Column(Float, nullable=False) # Gross value
+
+    stock = relationship('Stock')
+
+    @property
+    def net_value(self):
+        return self.value * (1 - stock.dividend_tax)
+
+    @property
+    def currency(self):
+        return self.stock.currency
