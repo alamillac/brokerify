@@ -85,6 +85,11 @@ class Stock(TableBase):
     def currency(self):
         return self.market.currency
 
+    @property
+    def value(self):
+        data = self.get_data()
+        return data.price
+
     @classmethod
     def get(cls, code):
         return db_session.query(cls).filter(cls.code == code).one_or_none()
@@ -305,6 +310,29 @@ class User(TableBase):
     name = Column(String(100), nullable=False)
     lastname = Column(String(100), nullable=False)
 
+    @classmethod
+    def get(cls, username):
+        return db_session.query(cls).filter(cls.username == username).one_or_none()
+
+    @classmethod
+    def get_or_create(cls, data):
+        if not data:
+            logger.info("Null data received")
+            return
+
+        instance = cls.get(data["username"])
+
+        if instance:
+            return instance
+
+        now = datetime.datetime.now()
+        instance = cls(**data)
+        instance.created_at = now
+        instance.updated_at = now
+        db_session.add(instance)
+        db_session.flush()
+        return instance
+
 
 class Portfolio(TableBase):
     __tablename__ = "portfolio"
@@ -327,12 +355,12 @@ class Portfolio(TableBase):
     sell_tax = Column(Float, nullable=False, default=0.19)
     dividend_tax = Column(Float, nullable=False, default=0.19)
 
-    objective = relationship('Objective')
+    objective = relationship('PortfolioObjective')
     user = relationship('User')
 
     @property
-    def price(self):
-        return 0  # TODO
+    def value(self):
+        return PortfolioStock.get_portfolio_value(self.id)
 
     @property
     def risk(self):
@@ -351,19 +379,15 @@ class Portfolio(TableBase):
             logger.info("Null data received")
             return
 
-        protfolio = Protfolio.get(data["code"])
-        if not stock:
-            logger.error("Stock %s not found" % data["code"])
-            return
-        instance = cls.get(stock.code, data["date"])
+        instance = cls.get(data["user_id"], data["name"])
 
         if instance:
             return instance
 
-        del data["code"]
-        data["stock_id"] = stock.id
+        now = datetime.datetime.now()
         instance = cls(**data)
-        instance.import_date = datetime.datetime.now()
+        instance.created_at = now
+        instance.updated_at = now
         db_session.add(instance)
         db_session.flush()
         return instance
@@ -393,6 +417,44 @@ class PortfolioStock(TableBase):
     @property
     def currency(self):
         return self.stock.currency
+
+    @classmethod
+    def add(cls, data):
+        now = datetime.datetime.now()
+        instance = cls(**data)
+        instance.created_at = now
+        instance.updated_at = now
+        db_session.add(instance)
+        db_session.flush()
+        return instance
+
+    @classmethod
+    def get_portfolio_value(cls, portfolio_id):
+        buy_events = db_session.query(cls).filter(cls.portfolio_id == portfolio_id, cls.type==cls.Type.BUY).all()
+        sell_events = db_session.query(cls).filter(cls.portfolio_id == portfolio_id, cls.type==cls.Type.SELL).all()
+        value = sum([ev.num_stocks * ev.stock.value for ev in buy_events]) - sum([ev.num_stocks * ev.stock.value for ev in sell_events])
+        return value
+
+    @classmethod
+    def get_portfolio_initial_value(cls, portfolio_id):
+        buy_stocks = db_session.query(cls.stock_id, func.sum(cls.num_stocks), func.sum(cls.num_stocks*cls.price)).filter(cls.portfolio_id == portfolio_id, cls.type==cls.Type.BUY).group_by(cls.stock_id).all()
+        sell_stocks = db_session.query(cls.stock_id, func.sum(cls.num_stocks)).filter(cls.portfolio_id == portfolio_id, cls.type==cls.Type.SELL).group_by(cls.stock_id).all()
+
+        value = 0
+        map_sell_stocks = {stock_id:num_stocks for stock_id, num_stocks in sell_stocks}
+        for stock_id, num_stocks, stock_price in buy_stocks:
+            num_sell_stocks = map_sell_stocks.get(stock_id)
+            if not num_sell_stocks:
+                value += stock_price
+                continue
+            avg_initial_price = stock_price / num_stocks
+            current_stocks = num_stocks - num_sell_stocks
+            value += avg_price * current_stocks
+        return value
+
+    @classmethod
+    def get_portfolio_valorization(cls, portfolio_id):
+        return cls.get_portfolio_value(portfolio_id) / cls.get_portfolio_initial_value(portfolio_id)
 
 
 class PortfolioObjective(TableBase):

@@ -1,0 +1,7 @@
+Código/ISIN,Nombre,Divisa activo,Tipo de operación,Fecha,Precio,Tipo cambio,Cantidad,Comisión,Importe,Divisa,Operación,Guardado
+EUR3359109.TR,Antena 3 Television,EUR,201,2018-04-16,"7,47",1,208,"10,82","1553,76",EUR,Compra,0
+EUR410441.TR,Banco Bilbao Vizcaya Argentaria,EUR,201,2018-04-04,"6,292",1,245,"10,43","1541,54",EUR,Compra,1
+EUR410457.TR,Banco Santander,EUR,201,2018-04-04,"5,155",1,599,"10,43","3087,85",EUR,Compra,1
+EUR410457.TR,Banco Santander,EUR,201,2018-04-25,"5,323",1,167,"10,66","888,94",EUR,Compra,1
+USD2559341.TR,FACEBOOK INC A,EUR,201,2018-05-01,"171,74","0,831645",17,"28,55","2428,05",USD,Compra,1
+EUR420081.TR,Inditex,EUR,201,2018-04-03,"25,504",1,70,"10,43","1785,28",EUR,Compra,1
