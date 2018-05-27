@@ -256,8 +256,7 @@ class StockHistoricalData(TableBase):
             db_engine.execute(cls.__table__.insert(), items)
         except sqlalchemy.exc.IntegrityError:
             for item in items:
-                stock = Stock.get_by_id(item["stock_id"])
-                instance = cls.get(stock.code, item["date"])
+                instance = cls.get_or_create(item)
                 instance.price = item["price"]
                 instance.expected_price = item["expected_price"]
                 instance.max_52 = item["max_52"]
@@ -279,7 +278,13 @@ class StockHistoricalData(TableBase):
             logger.info("Null data received")
             return
 
-        stock = Stock.get(data["code"])
+        if "code" in data:
+            stock = Stock.get(data["code"])
+            del data["code"]
+            data["stock_id"] = stock.id
+        else:
+            stock = Stock.get_by_id(data["stock_id"])
+
         if not stock:
             logger.error("Stock %s not found" % data["code"])
             return
@@ -288,8 +293,6 @@ class StockHistoricalData(TableBase):
         if instance:
             return instance
 
-        del data["code"]
-        data["stock_id"] = stock.id
         instance = cls(**data)
         instance.import_date = datetime.datetime.now()
         db_session.add(instance)
