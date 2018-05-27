@@ -295,10 +295,30 @@ class StockHistoricalData(TableBase):
         return "%s: price(%.2f) per(%.2f) growth(%.2f) dividend(%.2f) potential(%.2f) valorization(%.2f)" % (self.stock.name, self.price, self.per, self.growth_next_five_year, self.dividend_yield, self.potential, self.approx_valorization)
 
 
-class Portfolio(TableBase):
-    __tablename__ = "portfolio"
+class User(TableBase):
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    created_at = Column(DateTime, nullable=False, default=func.now)
+    updated_at = Column(DateTime, nullable=False)
+    username = Column(String(100), nullable=False, unique=True, index=True)
+    name = Column(String(100), nullable=False)
+    lastname = Column(String(100), nullable=False)
+
+
+class Portfolio(TableBase):
+    __tablename__ = "portfolio"
+    __table_args__ = (
+        IndexColumn(
+            'name_user_unique',
+            'user_id',
+            'name',
+            unique=True
+        ),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now)
     updated_at = Column(DateTime, nullable=False)
     name = Column(String(100), nullable=False)
@@ -308,6 +328,7 @@ class Portfolio(TableBase):
     dividend_tax = Column(Float, nullable=False, default=0.19)
 
     objective = relationship('Objective')
+    user = relationship('User')
 
     @property
     def price(self):
@@ -319,6 +340,33 @@ class Portfolio(TableBase):
     # TODO Diversificación (por fecha, por sector, por pais, por moneda)
     # TODO Rentabilidad (1mes, 3meses, 1año, desde inicio, etc) %, Tendencia %, Ratio Sharpe, VaR 95% anual -23,00%
     # TODO Dividendos
+
+    @classmethod
+    def get(cls, user_id, name):
+        return db_session.query(cls).filter(cls.user_id == user_id, name == name).one_or_none()
+
+    @classmethod
+    def get_or_create(cls, data):
+        if not data:
+            logger.info("Null data received")
+            return
+
+        protfolio = Protfolio.get(data["code"])
+        if not stock:
+            logger.error("Stock %s not found" % data["code"])
+            return
+        instance = cls.get(stock.code, data["date"])
+
+        if instance:
+            return instance
+
+        del data["code"]
+        data["stock_id"] = stock.id
+        instance = cls(**data)
+        instance.import_date = datetime.datetime.now()
+        db_session.add(instance)
+        db_session.flush()
+        return instance
 
 
 class PortfolioStock(TableBase):
