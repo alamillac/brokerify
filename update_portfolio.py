@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Update_portfolio")
 
 map_stocks = {
-    #"EUR3359109.TR": StockCodes.ANTENA_TRES,  # TODO adicionar a stocks
+    "EUR3359109.TR": StockCodes.ATRESMEDIA,
     "EUR410441.TR": StockCodes.BBVA,
     "EUR410457.TR": StockCodes.SANTANDER,
     "USD2559341.TR": StockCodes.FACEBOOK,
