@@ -52,6 +52,7 @@ class StockCodes:
 
     # ALL
     BME = "BME.MC"
+    ATRESMEDIA = "A3M.MC"
 
 # NASDAQ
     FACEBOOK = "FB"

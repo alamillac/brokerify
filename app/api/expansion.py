@@ -45,6 +45,7 @@ codes = {
     StockCodes.TELEFONICA: "M.TEF",
     StockCodes.VISCOFAN: "M.VIS",
     StockCodes.BME: "M.BME",
+    StockCodes.ATRESMEDIA: "M.A3M",
 
 # NASDAQ
     StockCodes.FACEBOOK: "NQFB",
