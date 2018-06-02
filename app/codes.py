@@ -2,6 +2,7 @@ class MarketCodes:
     BME = "BME"
     NASDAQ = "NASDAQ"
     NYSE = "NYSE"
+    FRANKFURT = "FRANKFURT"
 
 
 class IndexCodes:
@@ -53,6 +54,10 @@ class StockCodes:
     # ALL
     BME = "BME.MC"
     ATRESMEDIA = "A3M.MC"
+    EBRO = "EBRO.MC"
+
+# EUROPA
+    DEUTSCHE_BANK = "DBK.BE"
 
 # NASDAQ
     FACEBOOK = "FB"

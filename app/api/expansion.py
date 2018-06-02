@@ -5,7 +5,7 @@ import datetime
 from app.codes import StockCodes, MarketCodes
 
 #AVAILABLE_MARKETS = [MarketCodes.BME, MarketCodes.NYSE, MarketCodes.NASDAQ]
-AVAILABLE_MARKETS = [MarketCodes.BME]
+AVAILABLE_MARKETS = [MarketCodes.BME, MarketCodes.FRANKFURT]
 
 codes = {
 # BME
@@ -46,6 +46,10 @@ codes = {
     StockCodes.VISCOFAN: "M.VIS",
     StockCodes.BME: "M.BME",
     StockCodes.ATRESMEDIA: "M.A3M",
+    StockCodes.EBRO: "M.EVA",
+
+# EUROPA
+    StockCodes.DEUTSCHE_BANK: "XTDBK",
 
 # NASDAQ
     StockCodes.FACEBOOK: "NQFB",

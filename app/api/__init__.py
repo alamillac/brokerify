@@ -12,7 +12,7 @@ def get_data(stocks):
     for stock in stocks:
         logger.info("Getting data for stock %s" % stock.name)
         try:
-            if stock.market.name in finviz.AVAILABLE_MARKETS:
+            if stock.market.code in finviz.AVAILABLE_MARKETS:
                 logger.info("Finviz api")
                 stock_result = finviz.api(stock)
             else:
@@ -20,7 +20,7 @@ def get_data(stocks):
                 stock_result = expansion.api(stock)
 
             try:
-                if stock.market.name in yahoo.AVAILABLE_MARKETS:
+                if stock.market.code in yahoo.AVAILABLE_MARKETS:
                     logger.info("Yahoo api")
                     additional_info = yahoo.api(stock)
                     price = stock_result["value"]
