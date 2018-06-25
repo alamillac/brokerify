@@ -2,6 +2,8 @@ import logging
 import app.api.expansion
 import app.api.yahoo
 import app.api.finviz
+import app.api.wall_street_journal
+import app.api.eleconomista
 
 
 logger = logging.getLogger("Api")
@@ -50,4 +52,24 @@ def get_data(stocks):
         except Exception as e:
             logger.exception(e)
             logger.error("Error with stock %s" % stock.name)
+    return data
+
+
+def get_index_data(indices, start_date, end_date):
+    data = []
+    for index in indices:
+        try:
+            if index.code in wall_street_journal.AVAILABLE_INDEX:
+                logger.info("Wall street journal api")
+                result = wall_street_journal.api(index.code, start_date, end_date)
+            elif index.code in eleconomista.AVAILABLE_INDEX:
+                logger.info("El economista api")
+                result = eleconomista.api(index.code, start_date, end_date)
+            else:
+                logger.warning("Index %s not found", index.name)
+                continue
+            data += result
+        except Exception as e:
+            logger.exception(e)
+            logger.error("Error with index %s" % index.name)
     return data

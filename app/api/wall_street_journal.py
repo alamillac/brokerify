@@ -13,7 +13,7 @@ def api(index_name, start_date=datetime.date.today(), end_date=datetime.date.tod
     def parse(response, index_name):
         response_lines = response.split('\n')
         if len(response_lines) < 2:
-            raise Exception("Not found")
+            return []
 
         results = []
         for row in response_lines[1:]:

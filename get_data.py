@@ -3,9 +3,8 @@
 
 import logging
 import datetime
-from app.models.core import Stock, StockHistoricalData, IndexHistoricalPrices
-from app.api import get_data
-from app.api.wall_street_journal import api as index_api, AVAILABLE_INDEX
+from app.models.core import Stock, StockHistoricalData, IndexHistoricalPrices, Index
+from app.api import get_data, get_index_data
 
 
 logging.basicConfig(level=logging.INFO)
@@ -13,21 +12,13 @@ logger = logging.getLogger("Get_data")
 
 
 logger.info("Start getting index data")
-prices = []
 yesterday = (datetime.date.today() - datetime.timedelta(days=1))
-for index_name in AVAILABLE_INDEX:
-    h_index = IndexHistoricalPrices.get(index_name, yesterday)
-    if h_index:
-        logger.info("Price for index %s in date %s already exist", index_name, yesterday)
-        continue
-
-    try:
-        index_data = index_api(index_name, start_date=yesterday, end_date=yesterday)[0]
-        prices.append(index_data)
-    except:
-        continue
-logger.info("Saving index prices in db")
-IndexHistoricalPrices.bulk_insert(prices)
+index_to_search = [index for index in Index.all() if not IndexHistoricalPrices.get(index.code, yesterday)]
+if index_to_search:
+    prices = get_index_data(index_to_search, start_date=yesterday, end_date=yesterday)
+    if prices:
+        logger.info("Saving index prices in db")
+        IndexHistoricalPrices.bulk_insert(prices)
 logger.info("End get index data")
 
 
