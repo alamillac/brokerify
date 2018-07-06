@@ -27,7 +27,7 @@ codes = {
     StockCodes.ENAGAS: "M.ENG",
     StockCodes.ENDESA: "M.ELE",
     StockCodes.FERROVIAL: "M.FER",
-    StockCodes.GAS_NATURAL: "M.GAS",
+    StockCodes.GAS_NATURAL: "M.NTGY",
     StockCodes.GRIFOLS: "M.GRF",
     StockCodes.IAG: "M.IAG",
     StockCodes.IBERDROLA: "M.IBE",
