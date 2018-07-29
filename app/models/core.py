@@ -8,18 +8,27 @@ from app import settings
 from app.codes import CurrencyCodes
 import enum
 
-# Index table
 
-# Stock table
+db_session = None
+db_engine = None
+TableBase = declarative_base()
+logger = logging.getLogger("CoreDB")
+
+
+def init(*args, **kwargs):
+    global db_session
+    global db_engine
+    db_engine = create_engine(*args, **kwargs)
+    db_session = sessionmaker(bind=db_engine, autocommit=True)()
+
+
+def add(instance):
+    db_session.add(instance)
+    db_session.flush()
+
 
 DB_CONF = settings.DATABASE
-
-db_engine = create_engine(DB_CONF['url'], encoding=DB_CONF['encoding'])
-db_session = sessionmaker(bind=db_engine, autocommit=True)()
-
-TableBase = declarative_base()
-
-logger = logging.getLogger("CoreDB")
+init(DB_CONF['url'], encoding=DB_CONF['encoding'])
 
 
 class Index(TableBase):
