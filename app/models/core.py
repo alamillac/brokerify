@@ -321,6 +321,7 @@ class User(TableBase):
     username = Column(String(100), nullable=False, unique=True, index=True)
     name = Column(String(100), nullable=False)
     lastname = Column(String(100), nullable=False)
+    portfolios = relationship("Portfolio", back_populates="user")
 
     @classmethod
     def get(cls, username):
@@ -345,6 +346,10 @@ class User(TableBase):
         db_session.flush()
         return instance
 
+    @classmethod
+    def all(cls):
+        return db_session.query(cls).all()
+
 
 class Portfolio(TableBase):
     __tablename__ = "portfolio"
@@ -368,11 +373,27 @@ class Portfolio(TableBase):
     dividend_tax = Column(Float, nullable=False, default=0.19)
 
     objective = relationship('PortfolioObjective')
-    user = relationship('User')
+    user = relationship('User', back_populates="portfolios")
 
     @property
     def value(self):
+        return self.stocks_value + self.dividends
+
+    @property
+    def stocks_value(self):
         return PortfolioStock.get_portfolio_value(self.id)
+
+    @property
+    def initial_value(self):
+        return PortfolioStock.get_portfolio_initial_value(self.id)
+
+    @property
+    def valorization(self):
+        return self.value / self.initial_value
+
+    @property
+    def dividends(self):
+        return PortfolioDividend.get_portfolio_dividend_value(self.id)
 
     @property
     def risk(self):
@@ -425,6 +446,7 @@ class PortfolioStock(TableBase):
     exchange_rate = Column(Float, nullable=False, default=1)
 
     stock = relationship('Stock')
+    portfolio = relationship('Portfolio')
 
     @property
     def currency(self):
@@ -439,6 +461,23 @@ class PortfolioStock(TableBase):
         db_session.add(instance)
         db_session.flush()
         return instance
+
+    @classmethod
+    def get(cls, id):
+        return db_session.query(cls).filter(cls.id == id).one_or_none()
+
+    @classmethod
+    def update(cls, id, values):
+        query = db_session.query(cls).filter(cls.id == id)
+        query.update(values)
+        return query.one_or_none()
+
+    @classmethod
+    def get_list(cls, portfolio_id, stock_id=None):
+        query = db_session.query(cls).filter(cls.portfolio_id == portfolio_id)
+        if stock_id:
+            query = query.filter(cls.stock_id == stock_id)
+        return query.all()
 
     @classmethod
     def get_portfolio_value(cls, portfolio_id):
@@ -495,13 +534,31 @@ class PortfolioDividend(TableBase):
     stock_id = Column(Integer, ForeignKey('stock.id'), nullable=False)
     date = Column(Date, nullable=False)
     value = Column(Float, nullable=False) # Gross value
+    portfolio_id = Column(Integer, ForeignKey('portfolio.id'), nullable=False)
 
     stock = relationship('Stock')
+    portfolio = relationship('Portfolio')
 
     @property
     def net_value(self):
-        return self.value * (1 - stock.dividend_tax)
+        return self.value * (1 - self.portfolio.dividend_tax)
 
     @property
     def currency(self):
         return self.stock.currency
+
+    @classmethod
+    def get_list(cls, portfolio_id, stock_id=None):
+        query = db_session.query(cls).filter(cls.portfolio_id == portfolio_id)
+        if stock_id:
+            query = query.filter(cls.stock_id == stock_id)
+        return query.all()
+
+    @classmethod
+    def get(cls, id):
+        return db_session.query(cls).filter(cls.id == id).one_or_none()
+
+    @classmethod
+    def get_portfolio_dividend_value(cls, portfolio_id):
+        dividends = db_session.query(cls).filter(cls.portfolio_id == portfolio_id).all()
+        return sum([dividend.net_value for dividend in dividends])

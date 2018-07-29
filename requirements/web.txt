@@ -1,0 +1,5 @@
+-r core.txt
+Flask==0.12.2
+gunicorn
+flask-restful
+marshmallow

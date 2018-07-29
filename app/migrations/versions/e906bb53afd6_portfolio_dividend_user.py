@@ -66,9 +66,11 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('portfolio_id', sa.Integer(), nullable=False),
     sa.Column('stock_id', sa.Integer(), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('value', sa.Float(), nullable=False),
+    sa.ForeignKeyConstraint(['portfolio_id'], ['portfolio.id'], ),
     sa.ForeignKeyConstraint(['stock_id'], ['stock.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
