@@ -15,9 +15,13 @@ def api(stock):
 
         parser = BeautifulSoup(response, 'html.parser')
 
-        expected_price = float(get_value(parser, "Target Price"))
         price = float(get_value(parser, "Price"))
-        potential = (expected_price - price) * 100 / price
+        try:
+            expected_price = float(get_value(parser, "Target Price"))
+            potential = (expected_price - price) * 100 / price
+        except:
+            expected_price = None
+            potential = None
         dividend = float(get_value(parser, "Dividend %").replace('%','').replace('-','0'))
         range_52w = get_value(parser, "52W Range").split('-')
         min_52 = float(range_52w[0])

@@ -33,7 +33,10 @@ def get_data(stocks):
                         # Merge data
                         fundamental_analysis = stock_result["fundamental_analysis"]
                         yahoo_fundamental_analysis = additional_info["fundamental_analysis"]
-                        expected_price = (fundamental_analysis["expected_price"] + yahoo_fundamental_analysis["expected_price"])/2
+                        if fundamental_analysis["expected_price"]:
+                            expected_price = (fundamental_analysis["expected_price"] + yahoo_fundamental_analysis["expected_price"])/2
+                        else:
+                            expected_price = yahoo_fundamental_analysis["expected_price"]
                         potential = (expected_price - price) * 100 / price
 
                         fundamental_analysis["expected_price"] = expected_price
