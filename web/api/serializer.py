@@ -5,6 +5,10 @@ class IndexSchema(Schema):
     id = fields.Integer()
     code = fields.Str()
     name = fields.Str()
+    value = fields.Float()
+    valorization_one_day = fields.Float()
+    valorization_one_week = fields.Float()
+    valorization_one_year = fields.Float()
 
 
 class MarketSchema(Schema):
@@ -64,3 +68,18 @@ class PortfolioDividendSchema(Schema):
     stock = fields.Nested(StockSchema, only='name')
     date = fields.Date()
     value = fields.Float()
+
+
+class StockHistoricalSchema(Schema):
+    stock = fields.Nested(StockSchema, only=('id', 'name', 'market'))
+    date = fields.Date()
+    price = fields.Float()
+    expected_price = fields.Float()
+    max_52 = fields.Float()
+    per = fields.Float()
+    growth_next_year = fields.Float()
+    growth_next_five_year = fields.Float()
+    dividend_yield = fields.Float()
+    approx_valorization = fields.Float()
+    potential = fields.Float()
+    fixed_potential = fields.Float()

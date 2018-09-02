@@ -1,7 +1,7 @@
 from flask import current_app
 from flask import request
 from flask_restful import Resource
-from web.api.security import requires_auth
+from web.api.views.security import login_required
 from modules.logger import context
 from app.models.core import User, PortfolioStock, PortfolioDividend, db_session
 from web.api.serializer import UserSchema, PortfolioStockSchema, PortfolioDividendSchema
@@ -15,11 +15,11 @@ portfolio_stock_schema = PortfolioStockSchema(many=True)
 
 
 class UserResource(Resource):
-    @requires_auth
+    @login_required
     def get(self, username=None):
         context.update_uuid()
         if username:
-            current_app.logger.debug("Showing user %s", id)
+            current_app.logger.debug("Showing user %s", username)
             user = User.get(username)
             response = user_schema.dump(user)
             return response.data, 200
@@ -31,7 +31,7 @@ class UserResource(Resource):
 
 
 class UserStockResource(Resource):
-    @requires_auth
+    @login_required
     def get(self, portfolio_id, transaction_id=None):
         context.update_uuid()
         if not transaction_id:
@@ -45,7 +45,7 @@ class UserStockResource(Resource):
         response = PortfolioStockSchema().dump(stock_transaction)
         return response.data, 200
 
-    @requires_auth
+    @login_required
     def post(self, portfolio_id, transaction_id=None):
         context.update_uuid()
         data = request.get_json()
@@ -61,7 +61,7 @@ class UserStockResource(Resource):
         response = PortfolioStockSchema().dump(stock_transaction)
         return response.data, 201
 
-    @requires_auth
+    @login_required
     def put(self, portfolio_id, transaction_id):
         context.update_uuid()
         data = request.get_json()
@@ -84,7 +84,7 @@ class UserStockResource(Resource):
         response = PortfolioStockSchema().dump(stock_transaction)
         return response.data, 200
 
-    @requires_auth
+    @login_required
     def delete(self, portfolio_id, transaction_id):
         context.update_uuid()
         stock_transaction = PortfolioStock.get(transaction_id)
@@ -97,7 +97,7 @@ class UserStockResource(Resource):
 
 
 class UserDividendResource(Resource):
-    @requires_auth
+    @login_required
     def get(self, portfolio_id, dividend_id=None):
         context.update_uuid()
         if not dividend_id:

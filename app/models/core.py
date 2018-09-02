@@ -46,6 +46,41 @@ class Index(TableBase):
     def all(cls):
         return db_session.query(cls).all()
 
+    @property
+    def value(self):
+        last_price = db_session.query(IndexHistoricalPrices).filter(
+            IndexHistoricalPrices.index_id == self.id
+        ).order_by(IndexHistoricalPrices.date.desc()).first()
+        return last_price.close_price
+
+    @property
+    def valorization_one_day(self):
+        last_prices = db_session.query(IndexHistoricalPrices).filter(
+            IndexHistoricalPrices.index_id == self.id
+        ).order_by(IndexHistoricalPrices.date.desc()).limit(2)
+        return last_prices[0].close_price / last_prices[1].close_price
+
+    @property
+    def valorization_one_year(self):
+        return self.valorizations_since(365)
+
+    @property
+    def valorization_one_week(self):
+        return self.valorizations_since(7)
+
+    def valorizations_since(self, days):
+        today = datetime.datetime.today()
+        date_from = today - datetime.timedelta(days=days)
+        initial_price = self.get_value_from_date(date_from).close_price
+        return self.value / initial_price
+
+    def get_value_from_date(self, date):
+        value_in_date = db_session.query(IndexHistoricalPrices).filter(
+            IndexHistoricalPrices.index_id == self.id,
+            IndexHistoricalPrices.date >= date
+        ).order_by(IndexHistoricalPrices.date).first()
+        return value_in_date
+
     def get_return_from_date(self, date=None):
         if date:
             historical_prices = db_session.query(IndexHistoricalPrices).filter(

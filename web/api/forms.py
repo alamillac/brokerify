@@ -2,6 +2,7 @@ import datetime
 from marshmallow import Schema, fields, validates, ValidationError
 from app.models.core import PortfolioStock
 
+
 class UserStockForm(Schema):
     portfolio_id = fields.Integer(required=True)
     stock_id = fields.Integer(required=True)
@@ -22,3 +23,8 @@ class UserStockForm(Schema):
     def validate_type(self, value):
         if value not in [PortfolioStock.Type.BUY, PortfolioStock.Type.SELL]:
             raise ValidationError("Invalid type. It should be 'buy' or 'sell'")
+
+
+class LoginForm(Schema):
+    username = fields.Str(required=True)
+    password = fields.Str(required=True)

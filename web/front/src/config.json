@@ -1,0 +1,14 @@
+{
+    "develop": {
+        "baseUrl": "http://localhost:5000",
+        "debugLogs": true,
+        "useCors": true,
+        "loggerUrl": ""
+    },
+    "production": {
+        "baseUrl": "http://localhost:5000",
+        "debugLogs": false,
+        "useCors": false,
+        "loggerUrl": ""
+    }
+}

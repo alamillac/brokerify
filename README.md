@@ -15,3 +15,6 @@ ex: http://alembic.zzzcomputing.com/en/latest/tutorial.html
 
 ## Downgrade
 `alembic downgrade base`
+
+# TODO
+portfolio model
