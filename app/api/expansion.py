@@ -50,6 +50,8 @@ codes = {
 
 # EUROPA
     StockCodes.DEUTSCHE_BANK: "XTDBK",
+    StockCodes.ING_BANK: "AMING",
+    StockCodes.BMW: "XTBMW",
 
 # NASDAQ
     StockCodes.FACEBOOK: "NQFB",
