@@ -3,6 +3,7 @@ class MarketCodes:
     NASDAQ = "NASDAQ"
     NYSE = "NYSE"
     FRANKFURT = "FRANKFURT"
+    EURONEXT = "EURONEXT"
 
 
 class IndexCodes:
@@ -58,6 +59,8 @@ class StockCodes:
 
 # EUROPA
     DEUTSCHE_BANK = "DBK.BE"
+    ING_BANK = "INGA.AS"
+    BMW = "BMW.F"
 
 # NASDAQ
     FACEBOOK = "FB"
