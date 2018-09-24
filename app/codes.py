@@ -34,7 +34,7 @@ class StockCodes:
     ENAGAS = "ENG.MC"
     ENDESA = "ELE.MC"
     FERROVIAL = "FER.MC"
-    GAS_NATURAL = "GAS.MC"
+    GAS_NATURAL = "NTGY.MC"
     GRIFOLS = "GRF.MC"
     IAG = "IAG.MC"
     IBERDROLA = "IBE.MC"
@@ -58,7 +58,7 @@ class StockCodes:
     EBRO = "EBRO.MC"
 
 # EUROPA
-    DEUTSCHE_BANK = "DBK.BE"
+    DEUTSCHE_BANK = "DBK.F"
     ING_BANK = "INGA.AS"
     BMW = "BMW.F"
 
