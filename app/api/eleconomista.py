@@ -18,9 +18,9 @@ def api(index_name, start_date=datetime.date.today(), end_date=datetime.date.tod
     """
     def parse(response, index_name):
         parser = BeautifulSoup(response, 'html.parser')
-        table = parser.find("table", {"class": "tablehistoricos"})
+        table = parser.find("section", {"class": "general-tables"})
         results = []
-        for row in table.findAll("tr")[2:]:
+        for row in table.findAll("tr"):
             values = row.findAll("td")
             if len(values) < 7:
                 break
