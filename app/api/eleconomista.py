@@ -20,7 +20,7 @@ def api(index_name, start_date=datetime.date.today(), end_date=datetime.date.tod
         parser = BeautifulSoup(response, 'html.parser')
         table = parser.find("section", {"class": "general-tables"})
         results = []
-        for row in table.findAll("tr"):
+        for row in table.findAll("tr")[1:]:
             values = row.findAll("td")
             if len(values) < 7:
                 break
