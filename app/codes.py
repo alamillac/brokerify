@@ -97,6 +97,9 @@ class StockCodes:
     CHEVRON = "CVX"
     BANK_OF_AMERICA = "BAC"
     _3M = "MMM"
+    MORGAN_STANLEY = "MS"
+    GOLDMAN_SACHS = "GS"
+    PROCTER_AND_GAMBLE = "PG"
     # ...
 
 
