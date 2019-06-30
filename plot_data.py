@@ -24,7 +24,7 @@ logger.info("Start stock graph")
 stock_oportunities = {}
 for stock in Stock.all():
     s_return = stock.get_return_from_date()
-    if s_return[-1]['return'] < 0.95:
+    if s_return[-1]['return'] < 0.80:
         stock_oportunities[stock.name] = pd.Series({i['date']:i['return'] for i in s_return})
 
 if stock_oportunities:

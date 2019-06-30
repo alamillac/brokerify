@@ -2,7 +2,7 @@ from flask_restful import Api
 from web.api.views.security import Login
 from web.api.views.user import UserResource, UserStockResource, UserDividendResource
 from web.api.views.index import IndexResource
-from web.api.views.stock import StockResource
+from web.api.views.stock import StockResource, StockHistoricalResource
 
 def init_app(app):
     api = Api(app)
@@ -18,3 +18,4 @@ def init_app(app):
 
     # Stock resources
     api.add_resource(StockResource, '/api/stock', '/api/stock/<string:stock_id>')
+    api.add_resource(StockHistoricalResource, '/api/historical/stock', '/api/historical/stock/<string:stock_id>')

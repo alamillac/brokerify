@@ -24,6 +24,17 @@ class StockSchema(Schema):
     name = fields.Str()
     market = fields.Nested(MarketSchema)
     index = fields.Nested(IndexSchema)
+    historical = fields.Nested('StockHistoricalSchema', many=True)
+    stats = fields.Nested('StockHistoricalSchema')
+
+    def get_attribute(self, attr, obj, default):
+        if attr == 'stats':
+            return obj.get_data()
+
+        if attr == 'historical':
+            date = self.context['date']
+            return obj.get_historical_data(date)
+        return super().get_attribute(attr, obj, default)
 
 
 class PortfolioSchema(Schema):
@@ -71,7 +82,6 @@ class PortfolioDividendSchema(Schema):
 
 
 class StockHistoricalSchema(Schema):
-    stock = fields.Nested(StockSchema, only=('id', 'name', 'market'))
     date = fields.Date()
     price = fields.Float()
     expected_price = fields.Float()

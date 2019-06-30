@@ -28,3 +28,7 @@ class UserStockForm(Schema):
 class LoginForm(Schema):
     username = fields.Str(required=True)
     password = fields.Str(required=True)
+
+
+class StockHistoricalForm(Schema):
+    date = fields.DateTime(required=False, format="%Y-%m-%d")
