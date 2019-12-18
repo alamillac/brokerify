@@ -19,6 +19,8 @@ def api(index_name, start_date=datetime.date.today(), end_date=datetime.date.tod
         for row in response_lines[1:]:
             row_values = row.split(',')
             date = datetime.datetime.strptime(row_values[0], "%m/%d/%y").date()
+            if date < start_date or date > end_date:
+                continue
             open_val, high_val, low_val, close_val = [float(val) for val in row_values[1:]]
             results.append({
                 "name": index_name,
