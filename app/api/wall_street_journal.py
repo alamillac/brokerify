@@ -45,4 +45,6 @@ def api(index_name, start_date=datetime.date.today(), end_date=datetime.date.tod
         "startDate": start_date.strftime("%m/%d/%Y"),
         "endDate": end_date.strftime("%m/%d/%Y")
     }
-    return parse(requests.get(url, params=params).text, index_name)
+    return parse(requests.get(url, params=params, headers={
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.90 Safari/537.36"
+        }).text, index_name)
